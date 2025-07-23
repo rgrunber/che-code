@@ -23,7 +23,7 @@ components:
 
   - name: dev
     container:
-      image: quay.io/che-incubator-pull-requests/che-code-dev:pr-327-dev-amd64
+      image: quay.io/rgrunber/che-code-dev:latest
       memoryLimit: 8Gi
       memoryRequest: 512Mi
       cpuRequest: 500m

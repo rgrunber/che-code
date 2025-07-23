@@ -34,11 +34,12 @@ RUN cp /etc/ssh/sshd_config /opt/ssh/
 RUN sed -i 's|#Port 22|Port 2022|' /opt/ssh/sshd_config
 
 # provide the new path containing these host keys
-RUN sed -i 's|HostKey /etc/ssh/ssh_host_rsa_key|HostKey /opt/ssh/ssh_host_rsa_key|' /opt/ssh/sshd_config
-RUN sed -i 's|HostKey /etc/ssh/ssh_host_ecdsa_key|HostKey /opt/ssh/ssh_host_ecdsa_key|' /opt/ssh/sshd_config
-RUN sed -i 's|HostKey /etc/ssh/ssh_host_ed25519_key|HostKey /opt/ssh/ssh_host_ed25519_key|' /opt/ssh/sshd_config
+RUN sed -i 's|#HostKey /etc/ssh/ssh_host_rsa_key|HostKey /opt/ssh/ssh_host_rsa_key|' /opt/ssh/sshd_config
+RUN sed -i 's|#HostKey /etc/ssh/ssh_host_ecdsa_key|HostKey /opt/ssh/ssh_host_ecdsa_key|' /opt/ssh/sshd_config
+RUN sed -i 's|#HostKey /etc/ssh/ssh_host_ed25519_key|HostKey /opt/ssh/ssh_host_ed25519_key|' /opt/ssh/sshd_config
 
 RUN sed -i 's|#PubkeyAuthentication yes|PubkeyAuthentication yes|' /opt/ssh/sshd_config
+RUN sed -i 's|#AllowTcpForwarding yes|AllowTcpForwarding yes|' /opt/ssh/sshd_config
 RUN sed -i 's|AuthorizedKeysFile	.ssh/authorized_keys|AuthorizedKeysFile /home/user/ssh/authorized_keys|' /opt/ssh/sshd_config
 
 # Enable DEBUG log. You can ignore this but this may help you debug any issue while enabling SSHD for the first time
@@ -46,6 +47,7 @@ RUN sed -i 's|#LogLevel INFO|LogLevel DEBUG3|' /opt/ssh/sshd_config
 
 RUN sed -i 's|#StrictModes yes|StrictModes=no|' /opt/ssh/sshd_config
 
+#RUN echo 'user ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/user
 
 # Provide a path to store PID file which is accessible by normal user for write purpose
 RUN sed -i 's|#PidFile /var/run/sshd.pid|PidFile /opt/ssh/sshd.pid|' /opt/ssh/sshd_config
@@ -59,11 +61,14 @@ COPY --chown=0:0 /build/sshd.connect /
 
 
 # Step 4. Fix permissions
-RUN chmod 644 /opt/ssh/*
-RUN chmod 664 /opt/ssh/sshd_config
-RUN chown -R user:root /opt/ssh/
+RUN chmod 640 /opt/ssh/ssh_host_*_key
+RUN chmod 644 /opt/ssh/ssh_host_*_key.pub
+RUN chmod 644 /opt/ssh/sshd_config
+RUN chown -R root:root /opt/ssh/
 
-RUN chmod 774 /opt/ssh
+RUN chmod 755 /opt/ssh
+
+ENV USER_NAME=randomuser
 
 EXPOSE 2022
 
