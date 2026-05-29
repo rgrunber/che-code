@@ -1,0 +1,49 @@
+name: Dev Spaces Auto Validation
+on:
+  workflow_dispatch:
+    inputs:
+        EDITOR_DEFINITION:
+          description: 'The (optional) editor definition URL for SSHD.'
+          type: string
+
+jobs:
+  dw-auto-validate:
+    runs-on: ubuntu-22.04
+    strategy:
+      max-parallel: 1
+      matrix:
+        include:
+          - editor: sshd
+            image:
+          - editor: sshd
+            image: quay.io/redhat-user-workloads/devspaces-tenant/devspaces/code-sshd-rhel9:3.29
+          - editor: vscode
+            image:
+          - editor: vscode
+            image: quay.io/redhat-user-workloads/devspaces-tenant/devspaces/code-rhel9:3.29
+    steps:
+      - name: Install oc CLI
+        uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: latest
+      - name: Checkout Dev Spaces Auto Validation
+        uses: actions/checkout@v6
+        with:
+          repository: 'redhat-developer/devspaces-auto-validation'
+      - name: Login to OpenShift
+        run: |
+          oc login --token ${{ secrets.OC_TOKEN }} \
+                   --server ${{ secrets.OC_SERVER }} > /dev/null
+          oc project ${{ secrets.OC_PROJECT }} > /dev/null
+      - name: Run Dev Spaces Auto Validation
+        run: |
+          if [ "${{ inputs.EDITOR_DEFINITION }}" != '' ]; then
+            sed -i "s|https://.*\.yaml|${{ inputs.EDITOR_DEFINITION }}|" settings/settings-sshd.env
+          fi
+          cp images/images-full.txt images/images.txt
+          sed -i '/nodejs/!d' devfiles/devfiles.txt
+          if [ -n "${{ matrix.image }}" ]; then
+            PERMITTED_FAILURE_RATE=0.1 ./dw-auto-validate.sh -v -s ${{ matrix.editor }} -i ${{ matrix.image }}
+          else
+            PERMITTED_FAILURE_RATE=0.1 ./dw-auto-validate.sh -v -s ${{ matrix.editor }}
+          fi
