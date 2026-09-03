@@ -15,8 +15,13 @@ RUN microdnf -y install libsecret openssh-server nss_wrapper-libs \
       gzip tar which && \
     microdnf -y clean all --enablerepo='*'
 
+# Machine Exec
+# https://quay.io/eclipse/che-machine-exec.
+FROM quay.io/eclipse/che-machine-exec:next as machine-exec
+
 # UBI 9/10
 FROM registry.access.redhat.com/ubi9/nodejs-24-minimal:9.8-1785358511
+ARG CODEX_VERSION=0.153.0
 
 USER 0
 
@@ -34,12 +39,19 @@ RUN chmod 644 /etc/ssh/sshd_config
 RUN cp /etc/ssh/sshd_config /sshd-staging/
 
 # Add script to start and stop the service
-COPY --chown=0:0 /build/scripts/sshd.init /build/scripts/sshd.start /sshd-staging/
+COPY --chown=0:0 /build/scripts/sshd.init /build/scripts/sshd.start /build/scripts/codex.init /sshd-staging/
 
 RUN mkdir -p /opt/www/code /opt/www/jetbrains
 
 COPY /build/scripts/code-sshd-page/* /opt/www/code
 COPY /build/scripts/jetbrains-sshd-page/* /opt/www/jetbrains
+
+COPY --from=machine-exec --chown=0:0 /go/ubi8/bin/che-machine-exec /sshd-staging/ubi8/machine-exec
+COPY --from=machine-exec --chown=0:0 /go/ubi9/bin/che-machine-exec /sshd-staging/ubi9/machine-exec
+
+# Codex
+ARG CODEX_VERSION=0.153.0
+RUN curl https://releases.openai.com/codex/releases/${CODEX_VERSION}/codex-package-x86_64-unknown-linux-musl.tar.gz -o /sshd-staging/codex.tar.gz
 
 # Lock down /etc/passwd until fixed in UDI
 RUN chmod 644 /etc/passwd
