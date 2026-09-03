@@ -20,18 +20,28 @@ RUN microdnf -y install libsecret openssh-server nss_wrapper-libs \
 FROM quay.io/eclipse/che-machine-exec:next as machine-exec
 
 # UBI 9/10
-FROM registry.access.redhat.com/ubi9/nodejs-24-minimal:9.8-1785358511
+FROM registry.access.redhat.com/ubi9/nodejs-24-minimal:9.8
 
 USER 0
 
-RUN microdnf -y install libsecret openssh-server nss_wrapper-libs && \
+RUN microdnf -y install libsecret openssh-server nss_wrapper-libs libcap-devel meson xz gcc gcc-c++ && \
     microdnf -y clean all --enablerepo='*'
+
+ARG BWRAP_VERSION=0.11.0
+RUN curl -L \ 
+    "https://github.com/containers/bubblewrap/releases/download/v${BWRAP_VERSION}/bubblewrap-${BWRAP_VERSION}.tar.xz" -o /tmp/bubblewrap.tar.xz && \ 
+    tar -xf /tmp/bubblewrap.tar.xz -C /tmp && \ 
+    cd /tmp/bubblewrap-${BWRAP_VERSION} && \ 
+    meson setup _build --prefix=/usr && \ 
+    meson compile -C _build && \ 
+    meson install -C _build && \ 
+    rm -rf /tmp/bubblewrap*
 
 RUN mkdir -p /sshd-staging/ubi8 /sshd-staging/ubi9
 # UBI 8
 COPY --from=sshd-ubi8 /usr/sbin/sshd /usr/bin/ssh-keygen /usr/bin/tar /usr/bin/gzip /usr/bin/which /usr/lib64/libnss_wrapper.so /usr/lib64/libpam.so.0 /sshd-staging/ubi8/
 # UBI 9/10
-RUN cp /usr/sbin/sshd /usr/libexec/openssh/sshd-session /usr/bin/ssh-keygen /usr/bin/tar /usr/bin/gzip /usr/bin/which /usr/lib64/libnss_wrapper.so /usr/lib64/libpam.so.0 /usr/lib64/libeconf.so.0 /usr/lib64/libcrypt.so.2 /sshd-staging/ubi9/
+RUN cp /usr/sbin/sshd /usr/libexec/openssh/sshd-session /usr/bin/ssh-keygen /usr/bin/tar /usr/bin/gzip /usr/bin/which /usr/lib64/libnss_wrapper.so /usr/lib64/libpam.so.0 /usr/lib64/libeconf.so.0 /usr/lib64/libcrypt.so.2 /usr/bin/bwrap /sshd-staging/ubi9/
 
 # sshd_config is root:root 600
 RUN chmod 644 /etc/ssh/sshd_config
