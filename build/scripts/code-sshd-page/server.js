@@ -90,12 +90,16 @@ const server = http.createServer((req, res) => {
     </div>
     <div id="docs-extension" hidden>
       <ol>
-        <li class="extension-li">Install the following VS Code extensions :
+        <li class="extension-li">Install the following :
           <ul>
-            <li class="extension-li"><code>Dev Spaces Remote SSH</code> from the <a href="https://marketplace.visualstudio.com/items?itemName=redhat.devspaces-remote-ssh">VS Code Marketplace</a> or the <a href="https://open-vsx.org/extension/redhat/devspaces-remote-ssh">OpenVSX Registry</a></li>
-            <li class="extension-li"><code>Remote - SSH</code> from the <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh">VS Code Marketplace</a> <b>OR</b> <code>Open Remote - SSH</code> from the <a href="https://open-vsx.org/extension/jeanp413/open-remote-ssh">OpenVSX Registry</a></li>
+            <li class="extension-li"><code>Codex Desktop Application</code> from <a href="https://learn.chatgpt.com/docs/app">this web page</a></li>
+            <li class="extension-li"><code>Dev Spaces CLI Connector</code> and ensure it is on the user's PATH</li>
           </ul>
         </li>
+	<li><p class="center">Run <code id="devspaces-cli">devspaces-cli-connector --init</code><a href="#"><svg class="clipboard-img-code" onclick="copyToClipboard('devspaces-cli')" title="Copy" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 20 20">
+            <path fill="currentColor" d="M12 0H2C.9 0 0 .9 0 2v10h1V2c0-.6.4-1 1-1h10V0z"></path>
+            <path fill="currentColor" d="M18 20H8c-1.1 0-2-.9-2-2V8c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2zM8 7c-.6 0-1 .4-1 1v10c0 .6.4 1 1 1h10c.6 0 1-.4 1-1V8c0-.6-.4-1-1-1H8z"></path>
+          </svg></a> to register the URI handler.</p></li>
         <li class="extension-li">Click the URI below (you may need to accept the prompt allowing this page to open the link with your VS Code-based editor) <b>OR</b> from the "Remote Explorer" view, select the <code>Connect to Dev Spaces</code> command and input the URI below.</li>
         <div class="parent">
           <div>
@@ -112,6 +116,24 @@ const server = http.createServer((req, res) => {
             </a>
           </div>
         </div>
+
+        <li class="extension-li">Click the URI below (you may need to accept the prompt allowing this page to open the link with your Codex Application).</li>
+        <div class="parent">
+          <div>
+            <a href="codex://settings/connections/ssh/add?name=${process.env["DEVWORKSPACE_NAME"]}">
+              <pre id="codex-uri-connection">codex://settings/connections/ssh/add?name=${process.env["DEVWORKSPACE_NAME"]}</pre>
+            </a>
+          </div>
+          <div class="clipboard">
+            <a href="#">
+            <svg class="clipboard-img-pre" onclick="copyToClipboard('codex-uri-connection')" title="Copy" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 20 20">
+              <path fill="currentColor" d="M12 0H2C.9 0 0 .9 0 2v10h1V2c0-.6.4-1 1-1h10V0z"></path>
+              <path fill="currentColor" d="M18 20H8c-1.1 0-2-.9-2-2V8c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2zM8 7c-.6 0-1 .4-1 1v10c0 .6.4 1 1 1h10c.6 0 1-.4 1-1V8c0-.6-.4-1-1-1H8z"></path>
+            </svg>
+            </a>
+          </div>
+        </div>
+
       </ol>
     </div>
     <div id="docs-manual" hidden>

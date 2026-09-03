@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# Copyright (c) 2026 Red Hat, Inc.
+# This program and the accompanying materials are made
+# available under the terms of the Eclipse Public License 2.0
+# which is available at https://www.eclipse.org/legal/epl-2.0/
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+VERSION=0.153.0
+curl -L https://releases.openai.com/codex/releases/${VERSION}/codex-package-x86_64-unknown-linux-musl.tar.gz -o /tmp/codex.tar.gz
+
+mkdir -p $HOME/.codex/standalone/
+tar -xvzf /tmp/codex.tar.gz -C ~/.codex/standalone/
+ln -sf $HOME/.codex/standalone/bin/codex $HOME/bin/codex

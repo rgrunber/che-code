@@ -22,6 +22,10 @@ function initializePlatformContent() {
       currText = currText.replaceAll("/","\\");
       pathEntries[i].innerHTML = currText;
     }
+    var devspacesCmd = document.getElementById('devspaces-cli');
+    var currText = devspacesCmd.innerHTML;
+    currText = currText.replaceAll("devspaces-cli-connector", "devspaces-cli-connector.exe");
+    devspacesCmd.innerHTML = currText;
   }
   syncDocsContent();
 }

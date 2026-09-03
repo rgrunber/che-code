@@ -34,7 +34,7 @@ RUN chmod 644 /etc/ssh/sshd_config
 RUN cp /etc/ssh/sshd_config /sshd-staging/
 
 # Add script to start and stop the service
-COPY --chown=0:0 /build/scripts/sshd.init /build/scripts/sshd.start /sshd-staging/
+COPY --chown=0:0 /build/scripts/sshd.init /build/scripts/sshd.start /build/scripts/codex.init /sshd-staging/
 
 RUN mkdir -p /opt/www/code /opt/www/jetbrains
 
