@@ -39,7 +39,7 @@ jobs:
             --progress=plain \
             --push \
             -f build/dockerfiles/assembly.sshd.Dockerfile \
-            -t quay.io/rgrunber/che-code-sshd:latest .
+            -t quay.io/rgrunber/che-code-sshd-codex:latest .
 
 
       - name: Display docker images
